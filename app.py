@@ -51,10 +51,10 @@ def get_initial_tokens():
     }
 
     auth_url = f"https://accounts.spotify.com/authorize?{urlencode(auth_params)}"
-    print("Opening browser for authorization...")
+    print("auth in browser...")
     webbrowser.open(auth_url)
 
-    auth_code = input("\nPaste the code from the URL: ")
+    auth_code = input("\npaste url code:  ")
 
     response = requests.post(
         "https://accounts.spotify.com/api/token",
@@ -82,7 +82,7 @@ if tokens and tokens.get("refresh_token"):
         access_token = refresh_access_token(tokens["refresh_token"])
         save_tokens(access_token, tokens["refresh_token"])
     except:
-        print("Refresh failed, getting new tokens...")
+        print("whuppss, getting new tokens")
         access_token = get_initial_tokens()
 else:
     access_token = get_initial_tokens()
