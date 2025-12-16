@@ -50,6 +50,7 @@ def refresh_access_token(refresh_token):
 
 
 def get_initial_tokens():
+    print(REDIRECT_URI)
     auth_params = {
         "client_id": CLIENT_ID,
         "response_type": "code",
@@ -119,4 +120,4 @@ if playing.status_code == 200 and playing.text:
     artist = track["item"]["artists"][0]["name"]
     print(f"\nsong: {song} by {artist}")
 else:
-    print("\no song playing")
+    print("\nno song playing")
