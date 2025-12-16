@@ -1,12 +1,19 @@
 import json
 import os
+import threading
+import time
 import webbrowser
 from urllib.parse import urlencode
 
 import requests
+from progress.spinner import PixelSpinner
+
+spinner_event = threading.Event()
 
 TOKEN_FILE = "spotify_tokens.json"
 CREDENTIALS = "credentials.json"
+
+using_token = ""
 
 
 def save_tokens(access_token, refresh_token):
@@ -72,12 +79,21 @@ def get_initial_tokens():
     return data["access_token"]
 
 
+def token_spinner():
+    spinner = PixelSpinner("using access token from file ")
+    while using_token != "finished":
+        spinner.next()
+        time.sleep(0.075)
+
+
 CLIENT_ID = load_credentials("client_id")
 CLIENT_SECRET = load_credentials("client_secret")
 REDIRECT_URI = load_credentials("redirect_uri")
 tokens = load_tokens()
 if tokens and tokens.get("refresh_token"):
-    print("using saved token")
+    spinner_event.clear()
+    anim = threading.Thread(target=token_spinner)
+    anim.start()
     try:
         access_token = refresh_access_token(tokens["refresh_token"])
         save_tokens(access_token, tokens["refresh_token"])
@@ -87,7 +103,10 @@ if tokens and tokens.get("refresh_token"):
 else:
     access_token = get_initial_tokens()
 
-print("access token yay")
+spinner_event.set()
+using_token = "finished"
+
+print("\naccess token yay")
 
 playing = requests.get(
     "https://api.spotify.com/v1/me/player/currently-playing",
